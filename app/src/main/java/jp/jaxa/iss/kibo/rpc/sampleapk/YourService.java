@@ -1,8 +1,14 @@
 
 package jp.jaxa.iss.kibo.rpc.sampleapk;
 
+import org.opencv.aruco.Aruco;
+import org.opencv.aruco.DetectorParameters;
+import org.opencv.aruco.Dictionary;
 import org.opencv.core.Mat;
 import org.opencv.objdetect.QRCodeDetector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 
@@ -25,6 +31,7 @@ public class YourService extends KiboRpcService {
         Mat snapshot = api.getMatNavCam();
         String valueX = Convert(snapshot);
         api.judgeSendDiscoveredQR(0, valueX);
+
         moveToWrapper(11, -6, 5.55, 0, -0.7071068, 0, 0.7071068); //p1-2
         moveToWrapper(11, -5.5, 4.33, 0, -0.7071068, 0, 0.7071068);//p1-3
         moveToWrapper(11, -6.7, 4.33, 0, -0.7071068, 0, 0.7071068);
@@ -76,6 +83,16 @@ public class YourService extends KiboRpcService {
         QRCodeDetector detectAndDecode = new QRCodeDetector();
         String value = detectAndDecode.detectAndDecode(imgs);
         return value;
+    }
+
+    private void detectMarker(){
+        Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_4X4_50);
+
+        Mat inputImage = api.getMatNavCam();
+        List<Mat> corners = new ArrayList<>();
+        Mat markerIds = new Mat();
+        DetectorParameters parameters = DetectorParameters.create();
+        Aruco.detectMarkers(inputImage, dictionary, corners, markerIds, parameters );
     }
 
 }
