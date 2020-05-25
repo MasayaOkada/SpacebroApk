@@ -29,24 +29,52 @@ public class YourService extends KiboRpcService {
         moveToWrapper(10.6, -4.3, 5, 0, 0, -0.7071068, 0.7071068);
         moveToWrapper(11, -4.3, 5, 0, 0, -0.7071068, 0.7071068);
         moveToWrapper(11, -5.7, 5, 0, 0, -0.7071068, 0.7071068);
+
         moveToWrapper(11.5, -5.7, 4.5, 0, 0, 0, 1); //p1-1
-        Mat snapshot = api.getMatNavCam();
-        String valueX = Convert(snapshot);
+        Mat snapshot0 = api.getMatNavCam();
+        String valueX = Convert(snapshot0);
         api.judgeSendDiscoveredQR(0, valueX);
+        double valueXd = Double.parseDouble(valueX);
 
         moveToWrapper(11, -6, 5.55, 0, -0.7071068, 0, 0.7071068); //p1-2
+        Mat snapshot1 = api.getMatNavCam();
+        String valueY = Convert(snapshot1);
+        api.judgeSendDiscoveredQR(1, valueY);
+        double valueYd = Double.parseDouble(valueY);
+
         moveToWrapper(11, -5.5, 4.33, 0, -0.7071068, 0, 0.7071068);//p1-3
+        Mat snapshot2 = api.getMatNavCam();
+        String valueZ = Convert(snapshot2);
+        api.judgeSendDiscoveredQR(2, valueZ);
+        double valueZd = Double.parseDouble(valueZ);
+
         moveToWrapper(11, -6.7, 4.33, 0, -0.7071068, 0, 0.7071068);
         moveToWrapper(10.6, -6.7, 4.33, 0, -0.7071068, 0, 0.7071068);
         moveToWrapper(10.6, -7.3, 4.33, 0, -0.7071068, 0, 0.7071068);
 
         moveToWrapper(10.30, -7.5, 4.7, 0, 0, 1, 0);//p2-1
+        Mat snapshot3 = api.getMatNavCam();
+        String valueqX = Convert(snapshot3);
+        api.judgeSendDiscoveredQR(3, valueqX);
+        double valueqXd = Double.parseDouble(valueqX);
+
         moveToWrapper(10.30, -8, 4.7, 0, 0, 1, 0);
+
         moveToWrapper(11.5, -8, 5, 0, 0, 0, 1);//p2-2
+        Mat snapshot4 = api.getMatNavCam();
+        String valueqZ = Convert(snapshot4);
+        api.judgeSendDiscoveredQR(4, valueqZ);
+        double valueqZd = Double.parseDouble(valueqZ);
+
         moveToWrapper(11, -7.7, 5.55, 0, -0.7071068, 0, 0.7071068);//p2-3
+        Mat snapshot5 = api.getMatNavCam();
+        String valueqY = Convert(snapshot5);
+        api.judgeSendDiscoveredQR(5, valueqY);
+        double valueqYd = Double.parseDouble(valueqY);
+
+        moveToWrapper(valueXd, valueYd, valueZd, valueqXd, valueqYd, valueqZd, 1); //p3
 
         api.laserControl(true);
-        moveToWrapper(11.1, -6, 5.55, 0, -0.7071068, 0, 0.7071068);
 
         api.judgeSendFinishSimulation();
     }
