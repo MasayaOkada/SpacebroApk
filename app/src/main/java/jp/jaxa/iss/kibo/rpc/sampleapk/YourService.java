@@ -16,6 +16,8 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 
+import static org.opencv.aruco.Aruco.estimatePoseSingleMarkers;
+
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
  */
@@ -86,13 +88,25 @@ public class YourService extends KiboRpcService {
     }
 
     private void detectMarker(){
-        Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_4X4_50);
+        Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
 
         Mat inputImage = api.getMatNavCam();
         List<Mat> corners = new ArrayList<>();
         Mat markerIds = new Mat();
         DetectorParameters parameters = DetectorParameters.create();
-        Aruco.detectMarkers(inputImage, dictionary, corners, markerIds, parameters );
+        Aruco.detectMarkers(inputImage, dictionary, corners, markerIds, parameters);
+
+       // double cameraMatrix[][] = new double[3][3];
+        double cameraMatrix[][] = {{344.173397, 0.000000, 630.793795},{0.000000, 344.277922, 487.033834},{0.000000,
+                0.000000, 1.000000}};
+        //double distortionCoefficients[][] = new double[1][5];
+        double distortionCoefficients[][] = {{-0.152963, 0.017530, -0.001107, -0.000210, 0.000000}};
+
+        Mat rotationMatrix = new Mat(), translationVectors = new Mat(); // 受け取る
+        estimatePoseSingleMarkers(corners, 0.05f, cameraMatrix, distortionCoefficients, rotationMatrix, translationVectors);
+    }
+
+    private void estimatePoseSingleMarkers(List<Mat> corners, float v, double[][] cameraMatrix, double[][] distortionCoefficients, Mat rotationMatrix, Mat translationVectors) {
     }
 
 }
