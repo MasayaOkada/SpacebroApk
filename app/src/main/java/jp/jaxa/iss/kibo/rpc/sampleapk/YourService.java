@@ -16,6 +16,8 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.PI;
 import static org.opencv.aruco.Aruco.estimatePoseSingleMarkers;
 
 /**
@@ -72,7 +74,15 @@ public class YourService extends KiboRpcService {
         api.judgeSendDiscoveredQR(5, valueqY);
         double valueqYd = Double.parseDouble(valueqY);
 
-        moveToWrapper(valueXd, valueYd, valueZd, valueqXd, valueqYd, valueqZd, 1); //p3
+        moveToWrapper(11.45, -8, 4.65, 0, 0, 0, 1);
+        moveToWrapper(11.1, -8, 4.65, 0, 0, 0, 1);
+        moveToWrapper(11.1, -9, 4.65, 0, 0, 0, 1);
+
+        moveToWrapper(valueXd, valueYd, valueZd, valueqXd, valueqYd, valueqZd, 0); //p3
+
+        double Xd = valueXd + 0.20*cos(PI/4) - 0.0944;
+        double Zd = valueZd - 0.20*cos(PI/4) - 0.0385;
+        moveToWrapper(Xd, valueYd, Zd, valueqXd,valueqYd,valueqZd, 1); //target point for laser
 
         api.laserControl(true);
 
@@ -106,7 +116,6 @@ public class YourService extends KiboRpcService {
             result = api.moveTo(point, quaternion, true);
             ++loopCounter;
         }
-
     }
 
     private static String Convert(Mat imgs){
@@ -132,9 +141,11 @@ public class YourService extends KiboRpcService {
 
         Mat rotationMatrix = new Mat(), translationVectors = new Mat(); // 受け取る
         estimatePoseSingleMarkers(corners, 0.05f, cameraMatrix, distortionCoefficients, rotationMatrix, translationVectors);
+
     }
 
-    private void estimatePoseSingleMarkers(List<Mat> corners, float v, double[][] cameraMatrix, double[][] distortionCoefficients, Mat rotationMatrix, Mat translationVectors) {
+    private double[][] estimatePoseSingleMarkers(List<Mat> corners, float v, double[][] cameraMatrix, double[][] distortionCoefficients, Mat rotationMatrix, Mat translationVectors) {
+        return cameraMatrix;
     }
 
 }
