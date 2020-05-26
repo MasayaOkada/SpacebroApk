@@ -1,9 +1,7 @@
-package jp.jaxa.iss.kibo.rpc.sampleapk;
+package jp.jaxa.iss.kibo.rpc.spacebroapk;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import org.opencv.objdetect.QRCodeDetector;
 
 public class MainActivity extends AppCompatActivity{
  

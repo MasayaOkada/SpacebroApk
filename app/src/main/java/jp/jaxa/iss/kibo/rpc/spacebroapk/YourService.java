@@ -1,5 +1,5 @@
 
-package jp.jaxa.iss.kibo.rpc.sampleapk;
+package jp.jaxa.iss.kibo.rpc.spacebroapk;
 
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.DetectorParameters;
@@ -50,25 +50,24 @@ public class YourService extends KiboRpcService {
         api.judgeSendDiscoveredQR(2, valueZ);
         double valueZd = Double.parseDouble(valueZ);
 
-        moveToWrapper(11, -6.7, 4.33, 0, -0.7071068, 0, 0.7071068);
-        moveToWrapper(10.6, -6.7, 4.33, 0, -0.7071068, 0, 0.7071068);
-        moveToWrapper(10.6, -7.3, 4.33, 0, -0.7071068, 0, 0.7071068);
+        moveToWrapper(10.55, -5.5, 4.9, 0, 0, 1, 0);
+        moveToWrapper(10.55, -6.8, 4.9, 0, 0, 1, 0);
+        moveToWrapper(11.2, -6.8, 4.9, 0, 0, 1, 0);
+        moveToWrapper(11.2, -7.5, 4.9, 0, 0, 1, 0);
 
-        moveToWrapper(10.30, -7.5, 4.7, 0, 0, 1, 0);//p2-1
+        moveToWrapper(10.45, -7.5, 4.7, 0, 0, 1, 0);//p2-1
         Mat snapshot3 = api.getMatNavCam();
         String valueqX = Convert(snapshot3);
         api.judgeSendDiscoveredQR(3, valueqX);
         double valueqXd = Double.parseDouble(valueqX);
 
-        moveToWrapper(10.30, -8, 4.7, 0, 0, 1, 0);
-
-        moveToWrapper(11.5, -8, 5, 0, 0, 0, 1);//p2-2
+        moveToWrapper(11, -7.7, 5.55, 0, -0.7071068, 0, 0.7071068);//p2-3
         Mat snapshot4 = api.getMatNavCam();
         String valueqZ = Convert(snapshot4);
         api.judgeSendDiscoveredQR(4, valueqZ);
         double valueqZd = Double.parseDouble(valueqZ);
 
-        moveToWrapper(11, -7.7, 5.55, 0, -0.7071068, 0, 0.7071068);//p2-3
+        moveToWrapper(11.45, -8, 5, 0, 0, 0, 1);//p2-2
         Mat snapshot5 = api.getMatNavCam();
         String valueqY = Convert(snapshot5);
         api.judgeSendDiscoveredQR(5, valueqY);
