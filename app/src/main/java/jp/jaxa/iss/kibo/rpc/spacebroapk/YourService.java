@@ -28,11 +28,10 @@ public class YourService extends KiboRpcService {
     @Override
     protected void runPlan1(){
         api.judgeSendStart();
-        moveToWrapper(10.6, -4.3, 5, 0, 0, -0.7071068, 0.7071068);
-        moveToWrapper(11, -4.3, 5, 0, 0, -0.7071068, 0.7071068);
-        moveToWrapper(11, -5.7, 5, 0, 0, -0.7071068, 0.7071068);
 
-        moveToWrapper(11.5, -5.7, 4.5, 0, 0, 0, 1); //p1-1
+
+
+        moveToWrapper(11.45, -5.7, 4.5, 0, 0, 0, 1); //p1-1
         Mat snapshot0 = api.getMatNavCam();
         String valueX = Convert(snapshot0);
         api.judgeSendDiscoveredQR(0, valueX);
