@@ -29,8 +29,6 @@ public class YourService extends KiboRpcService {
     protected void runPlan1(){
         api.judgeSendStart();
 
-
-
         moveToWrapper(11.45, -5.7, 4.5, 0, 0, 0, 1); //p1-1
         Mat snapshot0 = api.getMatNavCam();
         String valueX = Convert(snapshot0);
@@ -97,7 +95,7 @@ public class YourService extends KiboRpcService {
         // write here your plan 3
     }
 
-    // You can add your method
+    // move to points method
     private void moveToWrapper(double pos_x, double pos_y, double pos_z,
                                double qua_x, double qua_y, double qua_z,
                                double qua_w){
@@ -116,12 +114,14 @@ public class YourService extends KiboRpcService {
         }
     }
 
+    // QR code reading method
     private static String Convert(Mat imgs){
         QRCodeDetector detectAndDecode = new QRCodeDetector();
         String value = detectAndDecode.detectAndDecode(imgs);
         return value;
     }
 
+    // AR marker method
     private void detectMarker(){
         Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
 
