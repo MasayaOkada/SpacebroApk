@@ -4,6 +4,7 @@ package jp.jaxa.iss.kibo.rpc.spacebroapk;
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.DetectorParameters;
 import org.opencv.aruco.Dictionary;
+
 import org.opencv.core.Mat;
 import org.opencv.objdetect.QRCodeDetector;
 
@@ -18,7 +19,6 @@ import gov.nasa.arc.astrobee.types.Quaternion;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.PI;
-import static org.opencv.aruco.Aruco.estimatePoseSingleMarkers;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -29,23 +29,38 @@ public class YourService extends KiboRpcService {
     protected void runPlan1(){
         api.judgeSendStart();
 
-        moveToWrapper(11.45, -5.7, 4.5, 0, 0, 0, 1); //p1-1
+        moveToWrapper(11.30, -5.7, 4.5, 0, 0, 0, 1); //p1-1
+
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Mat snapshot0 = api.getMatNavCam();
-        String valueX = Convert(snapshot0);
+        String valueX = convert(snapshot0);
         api.judgeSendDiscoveredQR(0, valueX);
-        double valueXd = Double.parseDouble(valueX);
 
-        moveToWrapper(11, -6, 5.55, 0, -0.7071068, 0, 0.7071068); //p1-2
+        moveToWrapper(11, -6, 5.40, 0, -0.7071068, 0, 0.7071068); //p1-2
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Mat snapshot1 = api.getMatNavCam();
-        String valueY = Convert(snapshot1);
+        String valueY = convert(snapshot1);
         api.judgeSendDiscoveredQR(1, valueY);
-        double valueYd = Double.parseDouble(valueY);
 
-        moveToWrapper(11, -5.5, 4.33, 0, -0.7071068, 0, 0.7071068);//p1-3
+        moveToWrapper(11, -5.5, 4.20, 0, -0.7071068, 0, 0.7071068);//p1-3
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Mat snapshot2 = api.getMatNavCam();
-        String valueZ = Convert(snapshot2);
+        String valueZ = convert(snapshot2);
         api.judgeSendDiscoveredQR(2, valueZ);
-        double valueZd = Double.parseDouble(valueZ);
+
 
         moveToWrapper(10.55, -5.5, 4.9, 0, 0, 1, 0);
         moveToWrapper(10.55, -6.8, 4.9, 0, 0, 1, 0);
@@ -53,32 +68,54 @@ public class YourService extends KiboRpcService {
         moveToWrapper(11.2, -7.5, 4.9, 0, 0, 1, 0);
 
         moveToWrapper(10.45, -7.5, 4.7, 0, 0, 1, 0);//p2-1
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Mat snapshot3 = api.getMatNavCam();
-        String valueqX = Convert(snapshot3);
+        String valueqX = convert(snapshot3);
         api.judgeSendDiscoveredQR(3, valueqX);
-        double valueqXd = Double.parseDouble(valueqX);
+
 
         moveToWrapper(11, -7.7, 5.55, 0, -0.7071068, 0, 0.7071068);//p2-3
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Mat snapshot4 = api.getMatNavCam();
-        String valueqZ = Convert(snapshot4);
+        String valueqZ = convert(snapshot4);
         api.judgeSendDiscoveredQR(4, valueqZ);
-        double valueqZd = Double.parseDouble(valueqZ);
 
         moveToWrapper(11.45, -8, 5, 0, 0, 0, 1);//p2-2
+        try {
+            wait(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Mat snapshot5 = api.getMatNavCam();
-        String valueqY = Convert(snapshot5);
+        String valueqY = convert(snapshot5);
         api.judgeSendDiscoveredQR(5, valueqY);
-        double valueqYd = Double.parseDouble(valueqY);
 
         moveToWrapper(11.45, -8, 4.65, 0, 0, 0, 1);
         moveToWrapper(11.1, -8, 4.65, 0, 0, 0, 1);
         moveToWrapper(11.1, -9, 4.65, 0, 0, 0, 1);
 
-        moveToWrapper(valueXd, valueYd, valueZd, valueqXd, valueqYd, valueqZd, 0); //p3
+        double valueXd = Double.parseDouble(valueX);
+        double valueYd = Double.parseDouble(valueY);
+        double valueZd = Double.parseDouble(valueZ);
+        double valueqXd = Double.parseDouble(valueqX);
+        double valueqYd = Double.parseDouble(valueqY);
+        double valueqZd = Double.parseDouble(valueqZ);
+
+
+        moveToWrapper(valueXd, valueYd, valueZd, valueqXd,valueqYd,valueqZd, 1); //target point for laser
 
         double Xd = valueXd + 0.20*cos(PI/4) - 0.0944;
         double Zd = valueZd - 0.20*cos(PI/4) - 0.0385;
-        moveToWrapper(Xd, valueYd, Zd, valueqXd,valueqYd,valueqZd, 1); //target point for laser
+
+        detectMarker();
 
         api.laserControl(true);
 
@@ -115,11 +152,12 @@ public class YourService extends KiboRpcService {
     }
 
     // QR code reading method
-    private static String Convert(Mat imgs){
+    private static String convert(Mat imgs){
         QRCodeDetector detectAndDecode = new QRCodeDetector();
         String value = detectAndDecode.detectAndDecode(imgs);
         return value;
     }
+
 
     // AR marker method
     private void detectMarker(){
@@ -145,5 +183,4 @@ public class YourService extends KiboRpcService {
     private double[][] estimatePoseSingleMarkers(List<Mat> corners, float v, double[][] cameraMatrix, double[][] distortionCoefficients, Mat rotationMatrix, Mat translationVectors) {
         return cameraMatrix;
     }
-
 }
