@@ -5,7 +5,10 @@ import org.opencv.aruco.Aruco;
 import org.opencv.aruco.DetectorParameters;
 import org.opencv.aruco.Dictionary;
 
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 import org.opencv.objdetect.QRCodeDetector;
 
 import java.util.ArrayList;
@@ -30,35 +33,21 @@ public class YourService extends KiboRpcService {
         api.judgeSendStart();
 
         moveToWrapper(11.30, -5.7, 4.5, 0, 0, 0, 1); //p1-1
-
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Mat snapshot0 = api.getMatNavCam();
-        String valueX = convert(snapshot0);
+        Mat snapshotx0 = calibration(snapshot0);
+        String valueX = convert(snapshotx0);
         api.judgeSendDiscoveredQR(0, valueX);
 
         moveToWrapper(11, -6, 5.40, 0, -0.7071068, 0, 0.7071068); //p1-2
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Mat snapshot1 = api.getMatNavCam();
-        String valueY = convert(snapshot1);
+        Mat snapshotx1 = calibration(snapshot1);
+        String valueY = convert(snapshotx1);
         api.judgeSendDiscoveredQR(1, valueY);
 
         moveToWrapper(11, -5.5, 4.20, 0, -0.7071068, 0, 0.7071068);//p1-3
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Mat snapshot2 = api.getMatNavCam();
-        String valueZ = convert(snapshot2);
+        Mat snapshotx2 = calibration(snapshot2);
+        String valueZ = convert(snapshotx2);
         api.judgeSendDiscoveredQR(2, valueZ);
 
 
@@ -68,32 +57,17 @@ public class YourService extends KiboRpcService {
         moveToWrapper(11.2, -7.5, 4.9, 0, 0, 1, 0);
 
         moveToWrapper(10.45, -7.5, 4.7, 0, 0, 1, 0);//p2-1
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Mat snapshot3 = api.getMatNavCam();
         String valueqX = convert(snapshot3);
         api.judgeSendDiscoveredQR(3, valueqX);
 
 
         moveToWrapper(11, -7.7, 5.55, 0, -0.7071068, 0, 0.7071068);//p2-3
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Mat snapshot4 = api.getMatNavCam();
         String valueqZ = convert(snapshot4);
         api.judgeSendDiscoveredQR(4, valueqZ);
 
         moveToWrapper(11.45, -8, 5, 0, 0, 0, 1);//p2-2
-        try {
-            wait(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         Mat snapshot5 = api.getMatNavCam();
         String valueqY = convert(snapshot5);
         api.judgeSendDiscoveredQR(5, valueqY);
@@ -108,7 +82,6 @@ public class YourService extends KiboRpcService {
         double valueqXd = Double.parseDouble(valueqX);
         double valueqYd = Double.parseDouble(valueqY);
         double valueqZd = Double.parseDouble(valueqZ);
-
 
         moveToWrapper(valueXd, valueYd, valueZd, valueqXd,valueqYd,valueqZd, 1); //target point for laser
 
@@ -151,6 +124,27 @@ public class YourService extends KiboRpcService {
         }
     }
 
+
+    //camera calibration
+    private Mat calibration(Mat imgs){
+
+       Mat outputImage = new Mat();
+       double cameraMatrix[] = {344.173397, 0.000000, 630.793795,0.000000, 344.277922, 487.033834, 0.000000, 0.000000, 1.000000};
+       double conf[] = {-0.152963, 0.017530, -0.001107, -0.000210, 0.00000};
+       Mat K  = new Mat(3,3, CvType.CV_32F);
+       K.put(0,0, cameraMatrix);
+       Mat D = new Mat(1,4,CvType.CV_32F);
+       D.put(0,0,conf);
+       Mat Knew = Mat.eye(3,3,1);
+       Size new_size = new Size(1280,960);
+
+       Calib3d.fisheye_undistortImage(imgs, outputImage,K,D, Knew , new_size);
+
+       return outputImage;
+    }
+
+
+
     // QR code reading method
     private static String convert(Mat imgs){
         QRCodeDetector detectAndDecode = new QRCodeDetector();
@@ -169,18 +163,15 @@ public class YourService extends KiboRpcService {
         DetectorParameters parameters = DetectorParameters.create();
         Aruco.detectMarkers(inputImage, dictionary, corners, markerIds, parameters);
 
-       // double cameraMatrix[][] = new double[3][3];
-        double cameraMatrix[][] = {{344.173397, 0.000000, 630.793795},{0.000000, 344.277922, 487.033834},{0.000000,
-                0.000000, 1.000000}};
-        //double distortionCoefficients[][] = new double[1][5];
-        double distortionCoefficients[][] = {{-0.152963, 0.017530, -0.001107, -0.000210, 0.000000}};
 
+        double cameraMatrix[] = {344.173397, 0.000000, 630.793795,0.000000, 344.277922, 487.033834, 0.000000, 0.000000, 1.000000};
+        double distortionCoefficients[] = {-0.152963, 0.017530, -0.001107, -0.000210, 0.00000};
+        Mat camera = new Mat(3,3,CvType.CV_32F);
+        Mat coef = new Mat(3,3,CvType.CV_32F);
+        camera.put(0,0,cameraMatrix);
+        coef.put(0,0,distortionCoefficients);
         Mat rotationMatrix = new Mat(), translationVectors = new Mat(); // 受け取る
-        estimatePoseSingleMarkers(corners, 0.05f, cameraMatrix, distortionCoefficients, rotationMatrix, translationVectors);
-
+        Aruco.estimatePoseSingleMarkers(corners, 0.05f, camera, coef, rotationMatrix, translationVectors);
     }
 
-    private double[][] estimatePoseSingleMarkers(List<Mat> corners, float v, double[][] cameraMatrix, double[][] distortionCoefficients, Mat rotationMatrix, Mat translationVectors) {
-        return cameraMatrix;
-    }
 }
